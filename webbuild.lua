@@ -9,7 +9,7 @@
 --]]
 local pp = require "preprocess"
 local files = require "filetree"
--- local rss = require "rss"
+local rss = require "rss"
 
 local help_txt = ([[
 usage: %s [input] [output] [options]
@@ -102,6 +102,7 @@ local function file_sandbox_fix(base_tree, file_obj)
 	local function internal(sbox)
 		sbox.file = file_obj
 		sbox.tree = base_tree[file_obj.containing_directory]
+		sbox.rss = rss
 		sbox.macros["$"] = function(...) return ... end
 		sbox.require_cache = {}
 		sbox.require_path = "/?.lua;/?/init.lua;./?.lua;./?/init.lua;/lua/?.lua;/lua/?/init.lua;"
