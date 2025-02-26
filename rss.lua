@@ -53,6 +53,31 @@ local function sandwich(field, str)
 	return "<" .. field .. ">" .. str .. "</" .. field .. ">"
 end
 
+function mod.compilePosts(branch, data, blacklist)
+	data = data or { link = "" }
+	local blist = {}
+	for _, name in pairs(blacklist) do
+		blist[name] = true
+	end
+	local compiled_posts = {}
+	for k, post in ipairs(branch:_lsfiles()) do
+		if not blist[post] then
+			post = branch[post]
+			local postdata = {}
+			postdata.file = post
+			postdata.title = post.metadata.title
+			postdata.description = post.metadata.description or ""
+			postdata.pubdate = post.metadata.date
+			postdata.link = data.link .. post.fullname
+			compiled_posts[#compiled_posts + 1] = postdata
+		end
+	end
+	table.sort(compiled_posts, function(a, b) 
+		return os.time(mod.dashdateToTimetable(a.pubdate)) > os.time(mod.dashdateToTimetable(b.pubdate))
+	end)
+	return compiled_posts
+end
+
 function mod.exportRSS(input)
 	assert(input.title and input.link and input.description)
 	local ex_txt = {"<channel>"}
