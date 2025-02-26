@@ -104,14 +104,24 @@ local function file_sandbox_fix(base_tree, file_obj)
 		sbox.tree = base_tree[file_obj.containing_directory]
 		sbox.macros["$"] = function(...) return ... end
 		sbox.require_cache = {}
+		sbox.require_path = "/?.lua;/?/init.lua;./?.lua;./?/init.lua;/lua/?.lua;/lua/?/init.lua;"
 		sbox.require = function(path)
-			if not path:find("%.lua$") then
-				path = path .. ".lua"
-			end
 			if sbox.require_cache[path] then
 				return sbox.require_cache[path]
 			end
-			local chunk, err = loadfile(arg[1] .. sbox.tree[path].fullname, "t", sbox)
+			local fixed_path
+			local fixed_name = path:gsub("%.", "/")
+			for dirpath in sbox.require_path:gmatch("[^;]+") do
+				local npath = dirpath:gsub("%?", path)
+				if sbox.tree[npath] then
+					fixed_path = npath
+					break
+				end
+			end
+			if not fixed_path then
+				error(sbox.file.fullname .. "\n\tcould not find file: '" .. path .. "'")
+			end
+			local chunk, err = loadfile(arg[1] .. sbox.tree[fixed_path].fullname, "t", sbox)
 			if err then
 				error(err, 2)
 			end
@@ -138,6 +148,9 @@ for _, file in ipairs(files_to_process) do
 		local tree2 = tree["/"]
 		tree2:_cd(file.containing_directory)
 		local template_name = tree2[file.metadata.template]
+		if not template_name then
+			error(file.fullname .. ":\n\tcould not find template file: " .. file.metadata.template)
+		end
 		pp.writefile(arg[1] .. template_name.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
 	else
 		pp.writefile(arg[1] .. file.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
