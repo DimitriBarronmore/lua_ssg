@@ -144,7 +144,7 @@ for _, file in ipairs(files_to_process) do
 	end
 	local sbox_fix = file_sandbox_fix(tree, file)
 	if file.metadata.template then
-		file.content = pp.getfile(arg[1] .. file.fullname)
+		file.content = pp.getfile(arg[1] .. file.fullname, {__setup_sandbox = sbox_fix})
 		-- we gotta copy the tree rq to get the template
 		local tree2 = tree["/"]
 		tree2:_cd(file.containing_directory)
