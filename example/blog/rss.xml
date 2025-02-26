@@ -1,0 +1,11 @@
+#---
+# data = {
+# 	feedURL = "https://example.com/rss",
+# 	title = "Preprocessor Test Feed",
+# 	link = "https://example.com",
+# 	description = "Test feed.",
+# 	posts = {},
+# }
+# local blog = tree["/blog"]
+# data.posts = rss.compilePosts(blog, data, {"index.html", "rss.xml"})
+$(rss.exportRSS(data))
