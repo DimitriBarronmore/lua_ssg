@@ -10,6 +10,7 @@
 local pp = require "preprocess"
 local files = require "filetree"
 local rss = require "rss"
+local md = require "md"
 
 local help_txt = ([[
 usage: %s [input] [output] [options]
@@ -74,6 +75,7 @@ local extensions_to_process = {
 	[".html"] = true,
 	[".xml"] = true,
 	[".css"] = true,
+	[".md"] = true,
 }
 
 local files_to_process = {}
@@ -145,6 +147,10 @@ for _, file in ipairs(files_to_process) do
 	local sbox_fix = file_sandbox_fix(tree, file)
 	if file.metadata.template then
 		file.content = pp.getfile(arg[1] .. file.fullname, {__setup_sandbox = sbox_fix})
+		if get_extension(file.fullname) == ".md" then
+			file.content = md(file.content)
+			file.fullname = string.gsub(file.fullname, "(%.[^.]+)$", ".html")
+		end
 		-- we gotta copy the tree rq to get the template
 		local tree2 = tree["/"]
 		tree2:_cd(file.containing_directory)
