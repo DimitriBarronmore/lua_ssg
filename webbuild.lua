@@ -138,7 +138,7 @@ local function file_sandbox_fix(base_tree, file_obj)
 	return internal
 end
 
-local tree = files.returnFiletree(arg[1], nil, file_callback)
+local tree = files.returnFiletree(arg[1], {mode = "blacklist", "%.git/"}, file_callback)
 for _, file in ipairs(files_to_process) do
 	check_dir_handle, err = io.open(arg[2] .. file.fullname, "w+")
 	if err and err:find("No such file or directory") then
