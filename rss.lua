@@ -78,7 +78,7 @@ function mod.compilePosts(branch, data, blacklist)
 	return compiled_posts
 end
 
-function mod.exportRSS(input)
+function mod.exportRSS(input, number)
 	assert(input.title and input.link and input.description)
 	local ex_txt = {"<channel>"}
 	local function add(indent, txt)
@@ -92,7 +92,12 @@ function mod.exportRSS(input)
 	add(1, sandwich("description", input.description))
 	add(1,sandwich("language", input.language or "en-us"))
 
-	for _, post in ipairs(input.posts) do
+	for i, post in ipairs(input.posts) do
+		if number then
+			if i > number then
+				break
+			end
+		end
 		assert(post.title and post.link and post.description)
 		add(1, "<item>")
 		add(2, sandwich("title", post.title))
