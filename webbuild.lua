@@ -149,7 +149,7 @@ for _, file in ipairs(files_to_process) do
 		file.content = pp.getfile(arg[1] .. file.fullname, {__setup_sandbox = sbox_fix})
 		if get_extension(file.fullname) == ".md" then
 			file.content = md(file.content)
-			file.fullname = string.gsub(file.fullname, "(%.[^.]+)$", ".html")
+			-- file.fullname = string.gsub(file.fullname, "(%.[^.]+)$", ".html")
 		end
 		-- we gotta copy the tree rq to get the template
 		local tree2 = tree["/"]
@@ -158,7 +158,7 @@ for _, file in ipairs(files_to_process) do
 		if not template_name then
 			error(file.fullname .. ":\n\tcould not find template file: " .. file.metadata.template)
 		end
-		pp.writefile(arg[1] .. template_name.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
+		pp.writefile(arg[1] .. template_name.fullname, arg[2] .. file.fullname:gsub("%.md$", ".html"), {__setup_sandbox = sbox_fix})
 	else
 		pp.writefile(arg[1] .. file.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
 	end
