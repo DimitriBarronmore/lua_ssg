@@ -1,7 +1,13 @@
 A simple tool for static website generation assembled in pure Lua.
 
+## Usage:
+All files must be in the Lua PATH or otherwise accessible via `require` for this tools to work. `webbuild.lua` is the main script, and can be run in any version of Lua 5.1 and above.
+
+It may be easiest to use a tool like [luastatic](https://github.com/ers35/luastatic) to compile the necessary files into a single binary and place that in your system PATH.
+
 ## Dependencies:
 - [preprocess.lua](https://github.com/DimitriBarronmore/preprocess.lua) must be working and in the Lua PATH.
+- Unix `file`, `find`, `mkdir`, `rm` utilities.
 
 ## License
 - `md.lua` is Copyright (c) 2016 Calvin Rose <calsrose@gmail.com> used under the MIT license. See the file for details.
