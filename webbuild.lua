@@ -104,6 +104,7 @@ local function file_sandbox_fix(base_tree, file_obj)
 	local function internal(sbox)
 		sbox.file = file_obj
 		sbox.tree = base_tree[file_obj.containing_directory]
+		sbox.md = md
 		sbox.rss = rss
 		sbox.macros["$"] = function(...) return ... end
 		sbox.require_cache = {}
