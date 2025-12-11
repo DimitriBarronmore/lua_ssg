@@ -63,6 +63,9 @@ function mod.compilePosts(branch, data, blacklist)
 	for k, post in ipairs(branch:_lsfiles()) do
 		if not blist[post] then
 			post = branch[post]
+			if post.metadata.ignore then
+				goto continue
+			end
 			local postdata = {}
 			postdata.file = post
 			postdata.title = post.metadata.title
@@ -70,10 +73,16 @@ function mod.compilePosts(branch, data, blacklist)
 			postdata.pubdate = post.metadata.date
 			postdata.link = data.link .. post.fullname:gsub("%.md", ".html")
 			compiled_posts[#compiled_posts + 1] = postdata
+			::continue::
 		end
 	end
-	table.sort(compiled_posts, function(a, b) 
-		return os.time(mod.dashdateToTimetable(a.pubdate)) > os.time(mod.dashdateToTimetable(b.pubdate))
+	table.sort(compiled_posts, function(a, b)
+		local at = os.time(mod.dashdateToTimetable(a.pubdate))
+		local bt = os.time(mod.dashdateToTimetable(b.pubdate))
+		if at == bt then
+			return a.file.shortname < b.file.shortname
+		end
+		return at > bt
 	end)
 	return compiled_posts
 end
