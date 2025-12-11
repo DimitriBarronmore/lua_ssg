@@ -36,6 +36,7 @@ for i = 1, #arg do
 end
 
 if is_directory(arg[2]) then
+	arg[2] = arg[2]:gsub("/$", "") -- Strip trailing slash if any.
 	local bool = false
 	while not (bool == "y" or bool == "n") do
 		io.stdout:write("Directory '" .. arg[2] .. "' already exists. Overwrite?  y/n) ")
@@ -89,7 +90,7 @@ local function file_callback(short, full)
 	end
 	if extensions_to_process[get_extension(short)] then
 		obj.metadata = pp.fmfile(arg[1] .. full) or {}
-		if obj.metadata.ignore then
+		if obj.metadata.ignore then -- TODO: Change this so it's not spitting out the frontmatter?
 			copy_file(arg[1] .. full, arg[2] .. full)
 		else
 			table.insert(files_to_process, obj)
@@ -139,19 +140,22 @@ local function file_sandbox_fix(base_tree, file_obj)
 	return internal
 end
 
+-- This is where the sausage gets made.
+-- First, get a file tree object of the source directory. Do not recurse into .git directories.
+-- file_callback runs as files are discovered and populates files_to_process.
 local tree = files.returnFiletree(arg[1], {mode = "blacklist", "%.git/"}, file_callback)
 for _, file in ipairs(files_to_process) do
-	check_dir_handle, err = io.open(arg[2] .. file.fullname, "w+")
-	if err and err:find("No such file or directory") then
-		os.execute(("mkdir --p -v %s"):format(arg[2] .. file.containing_directory))
-	end
+	-- Ensure the parent directory.
+	os.execute(("mkdir --p -v %s"):format(arg[2] .. file.containing_directory))
 	local sbox_fix = file_sandbox_fix(tree, file)
+	-- Get the file's content as run through the preprocessor.
+	file.content = pp.getfile(arg[1] .. file.fullname, {__setup_sandbox = sbox_fix})
+	-- If it's markdown, convert the compiled markdown content.
+	if get_extension(file.fullname) == ".md" then
+		file.content = md(file.content)
+	end
+	-- If there's a template, we find it and compile through that.
 	if file.metadata.template then
-		file.content = pp.getfile(arg[1] .. file.fullname, {__setup_sandbox = sbox_fix})
-		if get_extension(file.fullname) == ".md" then
-			file.content = md(file.content)
-			-- file.fullname = string.gsub(file.fullname, "(%.[^.]+)$", ".html")
-		end
 		-- we gotta copy the tree rq to get the template
 		local tree2 = tree["/"]
 		tree2:_cd(file.containing_directory)
@@ -161,7 +165,13 @@ for _, file in ipairs(files_to_process) do
 		end
 		pp.writefile(arg[1] .. template_name.fullname, arg[2] .. file.fullname:gsub("%.md$", ".html"), {__setup_sandbox = sbox_fix})
 	else
-		pp.writefile(arg[1] .. file.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
+		-- We already have the output, so we just need to write it.
+		-- Ensure it's an html file if it's markdown.
+		local f = io.open(arg[2] .. file.fullname:gsub("%.md$", ".html"), "w+")
+		f:write(file.content)
+		f:flush()
+		f:close()
+		-- pp.writefile(arg[1] .. file.fullname, arg[2] .. file.fullname, {__setup_sandbox = sbox_fix})
 	end
 end
 --- testing
