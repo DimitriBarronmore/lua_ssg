@@ -10,7 +10,7 @@
 local pp = require "preprocess"
 local files = require "filetree"
 local rss = require "rss"
-local md = require "md"
+local md = require "md_pandoc"
 
 local help_txt = ([[
 usage: %s [input] [output] [options]

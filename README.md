@@ -8,9 +8,9 @@ It may be easiest to use a tool like [luastatic](https://github.com/ers35/luasta
 ## Dependencies:
 - [preprocess.lua](https://github.com/DimitriBarronmore/preprocess.lua) must be working and in the Lua PATH.
 - Unix `file`, `find`, `mkdir`, `rm` utilities.
+- [Pandoc](https://pandoc.org) on your commandline.
 
 ## License
-- `md.lua` is Copyright (c) 2016 Calvin Rose <calsrose@gmail.com> used under the MIT license. See the file for details.
 - All other files are Copyright (c) 2025 DimitriBarronmore, released under the MIT license.
 
 ### MIT License
