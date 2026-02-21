@@ -35,9 +35,9 @@ function mod.rfc822datetime(time, tz)
 end
 function mod.dashdateToTimetable(input)
 	local time = {
-		month = input:sub(1, 2),
-		day = input:sub(4, 5),
-		year = input:sub(7, 10)
+		year = input:sub(1, 4),
+		month = input:sub(6, 7),
+		day = input:sub(9, 10)
 	}
 	if input:len() > 10 then
 		time.hour = input:sub(12, 13)
