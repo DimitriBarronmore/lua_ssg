@@ -71,7 +71,7 @@ function mod.compilePosts(branch, data, blacklist)
 			postdata.title = post.metadata.title
 			postdata.description = post.metadata.description or ""
 			postdata.pubdate = post.metadata.date
-			postdata.link = data.link .. post.fullname:gsub("%.md", ".html")
+			postdata.link = data.link .. "/" .. post.shortname:gsub("%.md", ".html")
 			compiled_posts[#compiled_posts + 1] = postdata
 			::continue::
 		end
