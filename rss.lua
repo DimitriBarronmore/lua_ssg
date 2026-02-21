@@ -30,8 +30,8 @@ mod.test_data = {
 	}
 }
 
-function mod.rfc822datetime(time)
-	return os.date("%a, %d %b %Y %X %Z", time)
+function mod.rfc822datetime(time, tz)
+	return os.date("%a, %d %b %Y %X ", time) .. (tz or "GMT")
 end
 function mod.dashdateToTimetable(input)
 	local time = {
@@ -44,6 +44,9 @@ function mod.dashdateToTimetable(input)
 		time.min = input:sub(15, 16)
 		if input:len() > 16 then
 			time.sec = input:sub(18, 19)
+		end
+		if input:len() > 19 then
+			time.tz = input:sub(21, 23)
 		end
 	end
 	return time
@@ -112,7 +115,8 @@ function mod.exportRSS(input, number)
 		add(2, sandwich("title", post.title))
 		add(2, sandwich("link", post.link))
 		add(2, sandwich("description", post.description))
-		add(2, sandwich("pubDate", mod.rfc822datetime(os.time(mod.dashdateToTimetable(post.pubdate)))))
+		local tt = mod.dashdateToTimetable(post.pubdate)
+		add(2, sandwich("pubDate", mod.rfc822datetime(os.time(tt), tt.tz)))
 		add(2, sandwich("guid", post.guid or post.link))
 		add(1, "</item>")
 	end
